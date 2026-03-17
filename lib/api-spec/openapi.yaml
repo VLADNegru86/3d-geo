@@ -1,0 +1,387 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Geo3D Library API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: resources
+    description: Geological resources
+  - name: categories
+    description: Resource categories
+  - name: maps
+    description: Map data
+  - name: stratigraphic
+    description: Stratigraphic data
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /resources:
+    get:
+      operationId: listResources
+      tags: [resources]
+      summary: List geological resources
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: region
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of resources
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceListResponse"
+    post:
+      operationId: createResource
+      tags: [resources]
+      summary: Create a resource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateResourceInput"
+      responses:
+        "201":
+          description: Created resource
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resource"
+
+  /resources/{id}:
+    get:
+      operationId: getResource
+      tags: [resources]
+      summary: Get a resource by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Resource
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resource"
+        "404":
+          description: Not found
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /map-points:
+    get:
+      operationId: listMapPoints
+      tags: [maps]
+      summary: List map data points
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: region
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Map points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MapPoint"
+
+  /stratigraphic-units:
+    get:
+      operationId: listStratigraphicUnits
+      tags: [stratigraphic]
+      summary: List stratigraphic units
+      parameters:
+        - name: era
+          in: query
+          schema:
+            type: string
+        - name: region
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stratigraphic units
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StratigraphicUnit"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [resources]
+      summary: Get statistics
+      responses:
+        "200":
+          description: Site statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Resource:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [publication, dataset, map, model3d, report, image]
+        categoryId:
+          type: integer
+        categoryName:
+          type: string
+        region:
+          type: string
+        author:
+          type: string
+        year:
+          type: integer
+        thumbnailUrl:
+          type: string
+        downloadUrl:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - type
+        - createdAt
+
+    CreateResourceInput:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [publication, dataset, map, model3d, report, image]
+        categoryId:
+          type: integer
+        region:
+          type: string
+        author:
+          type: string
+        year:
+          type: integer
+        thumbnailUrl:
+          type: string
+        downloadUrl:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      required:
+        - title
+        - type
+
+    ResourceListResponse:
+      type: object
+      properties:
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/Resource"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - resources
+        - total
+        - page
+        - limit
+        - totalPages
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        resourceCount:
+          type: integer
+        iconName:
+          type: string
+        color:
+          type: string
+      required:
+        - id
+        - name
+        - slug
+
+    MapPoint:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        description:
+          type: string
+        resourceId:
+          type: integer
+        age:
+          type: string
+        formation:
+          type: string
+      required:
+        - id
+        - name
+        - type
+        - latitude
+        - longitude
+
+    StratigraphicUnit:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        era:
+          type: string
+        period:
+          type: string
+        epoch:
+          type: string
+        ageFrom:
+          type: number
+        ageTo:
+          type: number
+        color:
+          type: string
+        description:
+          type: string
+        region:
+          type: string
+      required:
+        - id
+        - name
+        - era
+        - ageFrom
+        - ageTo
+
+    Stats:
+      type: object
+      properties:
+        totalResources:
+          type: integer
+        totalCategories:
+          type: integer
+        totalMapPoints:
+          type: integer
+        totalDownloads:
+          type: integer
+        regions:
+          type: integer
+      required:
+        - totalResources
+        - totalCategories
+        - totalMapPoints
+        - totalDownloads
+        - regions

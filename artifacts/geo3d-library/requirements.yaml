@@ -1,0 +1,17 @@
+packages:
+  "framer-motion": "For page transitions, smooth enter animations, and micro-interactions"
+  "lucide-react": "For beautiful consistent iconography"
+  "clsx": "For conditional class names"
+  "tailwind-merge": "For merging tailwind classes safely"
+  "@hookform/resolvers": "For form validation with Zod"
+  "react-hook-form": "For robust form state management"
+
+images:
+  - path: "artifacts/geo3d-library/public/images/hero-bg.png"
+    description: "Abstract 3D scientific visualization of geological strata and topographic mesh in deep navy blue, teal, and glowing amber accents. Cinematic lighting, academic, mysterious, clean."
+    aspect_ratio: "16:9"
+
+notes:
+  - Expects hooks to be available at @workspace/api-client-react as per implementation notes.
+  - Using framer-motion for premium feel.
+  - Theme is dark academic (deep blues, slate, amber).
